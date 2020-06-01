@@ -1,4 +1,4 @@
-const functions = require('firebase-functions');
+﻿const functions = require('firebase-functions');
 const jwt = require('jsonwebtoken');
 const https = require('https');
 const express = require('express');
@@ -58,17 +58,41 @@ var getOptionsMonth = function (year, month) {
     };
     return options20;
 };
+var getOptionsDaily = function (year, month, day) {
+    var options19 = {
+        host: "api.appstoreconnect.apple.com",
+        //path: '/v1/apps/1515131292' 
+        path: `/v1/salesReports?filter[frequency]=DAILY&filter[reportDate]=${year}-${month}-${day}&filter[reportSubType]=SUMMARY&filter[reportType]=SALES&filter[vendorNumber]=88221566&filter[version]=1_0`,
+        method: 'GET',
+        headers: {
+            'Accept': 'application/a-gzip, application/json',
+            'Authorization': 'Bearer ' + token
+        }
+    };
+    return options19;
+};
 
 app.get('/app', (request, response) => {
 
     //1: app downloads, 3: redownloads, 8: app updates
     var units = 0;
-    var dates = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
-    var req = https.request(getOptionsYear(2019), (res) => {
+    var months = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
+    var days = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31']
+
+    var datetime = new Date();
+    datetime.setDate(datetime.getDate() - 2);
+    let year = datetime.getFullYear();
+    let month = datetime.getMonth();
+    let day = datetime.getDate();
+
+    console.log(`${year} - ${months[month]} - ${days[day - 1]}`);
+
+    var req = https.request(getOptionsDaily(year, months[month], days[day - 1]), (res) => {
         var pti = [0, 0, 0, 0, 0, 0, 0, 0];
         res.on('data', function (chunk) {
 
             var dataFromFile = pako.inflate(chunk, { to: 'string' })
+
             dataFromFile = dataFromFile.trim();
             var dataFromFileArray = dataFromFile.split('\n');
             var i;
@@ -76,9 +100,9 @@ app.get('/app', (request, response) => {
                 var lineDataFromFileArray = dataFromFileArray[i].split('\t');
                 pti[parseInt(lineDataFromFileArray[6])] += parseInt(lineDataFromFileArray[7])
             }
-            console.log(`Total Units for 2019: ${pti[1]}`);
+            console.log(`Total Units: ${pti[1]}`);
             units += pti[1];
-            response.render('apps', { text: units });
+            response.render('apps', { _year: year, _month: months[month], _day: days[day - 1], text: units });
         });
 
     });
