@@ -1,6 +1,6 @@
 # Project
 Copyright © 2020 Andrew Rotert. All rights reserved.
-#### On The Hunt
+#### App Store Connect API
 Node JS file to access App Store Connect API via Firebase Cloud Function. 
 
 - [x] Published - DevelopedNotDownloaded.com/app
