@@ -98,7 +98,12 @@ app.get('/app', (request, response) => {
             var i;
             for (i = 1; i < dataFromFileArray.length; i++) {
                 var lineDataFromFileArray = dataFromFileArray[i].split('\t');
-                pti[parseInt(lineDataFromFileArray[6])] += parseInt(lineDataFromFileArray[7])
+                try {
+                    pti[parseInt(lineDataFromFileArray[6])] += parseInt(lineDataFromFileArray[7]);
+                }
+                catch (err) {
+                    console.log(`Cannot parse type: ${lineDataFromFileArray[6]} Error: ${err}`);
+                }
             }
             console.log(`Total Units: ${pti[1]}`);
             units += pti[1];
