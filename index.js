@@ -14,100 +14,102 @@ app.engine('hbs', engines.handlebars);
 app.set('views', './views')
 app.set('view engine', 'hbs')
 
-//Initialize firebase firestore db
-admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount)
-});
-
-const db = admin.firestore();
-
-//route to db data
-var collections = db.collection("APIAccessData");
-
-//Returns data for a given date
-function getDataFromDate(date) {
-    return collections.doc(date).get()
-}
-
-//Sets data for a given date 
-function setDataFromDate(date, appDownloads) {
-    collections.doc(date).set({
-        downloads: appDownloads
-    });
-}
-
-//Credentials needed to connect to API
-let issuerId = "found-in-appstore-connect";
-let apiKeyId = "found-from-private-key-file";
-//Either route will work for private key
-//let privateKey = fs.readFileSync(`./Apple_Key/AuthKey_${apiKeyId}.p8`);
-let privateKey = 'copy and paste p8 key as plain text. Include the begin and end lines, along with \n between each line'
-
-//Expires date, set 20m into future
-let now = Math.round((new Date()).getTime() / 1000) + 1199;
-
-//Setup for token
-let payload = {
-    "iss": issuerId,
-    "exp": now,
-    "aud": "appstoreconnect-v1"
-};
-let signOptions = {
-    "algorithm": "ES256",
-    header: {
-        "alg": "ES256",
-        "kid": apiKeyId,
-        "typ": "JWT"
-    }
-};
-
-let token = jwt.sign(payload, privateKey, signOptions);
-
-//Options for what data to have returned
-var getOptionsYear = function (year) {
-    //YYYY 
-    var options19 = {
-        host: "api.appstoreconnect.apple.com",
-        //path: '/v1/apps/1515131292'
-        path: `/v1/salesReports?filter[frequency]=YEARLY&filter[reportDate]=${year}&filter[reportSubType]=SUMMARY&filter[reportType]=SALES&filter[vendorNumber]=88221566&filter[version]=1_0`,
-        method: 'GET',
-        headers: {
-            'Accept': 'application/a-gzip, application/json',
-            'Authorization': 'Bearer ' + token
-        }
-    };
-    return options19;
-};
-var getOptionsMonth = function (year, month) {
-    //YYYY-MM 
-    var options20 = {
-        host: "api.appstoreconnect.apple.com",
-        path: `/v1/salesReports?filter[frequency]=MONTHLY&filter[reportDate]=${year}-${month}&filter[reportSubType]=SUMMARY&filter[reportType]=SALES&filter[vendorNumber]=88221566&filter[version]=1_0`,
-        method: 'GET',
-        headers: {
-            'Accept': 'application/a-gzip, application/json',
-            'Authorization': 'Bearer ' + token
-        }
-    };
-    return options20;
-};
-var getOptionsDaily = function (year, month, day) {
-    var options19 = {
-        //YYYY-MM-DD 
-        host: "api.appstoreconnect.apple.com",
-        //path: '/v1/apps/1515131292' 
-        path: `/v1/salesReports?filter[frequency]=DAILY&filter[reportDate]=${year}-${month}-${day}&filter[reportSubType]=SUMMARY&filter[reportType]=SALES&filter[vendorNumber]=88221566&filter[version]=1_0`,
-        method: 'GET',
-        headers: {
-            'Accept': 'application/a-gzip, application/json',
-            'Authorization': 'Bearer ' + token
-        }
-    };
-    return options19;
-};
-
-//Renders webpage 
+//Renders webpage
 app.get('/app', (request, response) => {
+
+    //Initialize firebase firestore db 
+    admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount)
+    });
+
+    const db = admin.firestore();
+
+    //route to db data
+    var collections = db.collection("APIAccessData");
+
+    //Returns data for a given date
+    function getDataFromDate(date) {
+        return collections.doc(date).get()
+    }
+
+    //Sets data for a given date 
+    function setDataFromDate(date, appDownloads) {
+        collections.doc(date).set({
+            downloads: appDownloads
+        });
+    }
+
+    //Credentials needed to connect to API
+    let issuerId = "found-in-appstore-connect";
+    let apiKeyId = "found-from-private-key-file";
+    //Either route will work for private key
+    //let privateKey = fs.readFileSync(`./Apple_Key/AuthKey_${apiKeyId}.p8`);
+    let privateKey = 'copy and paste p8 key as plain text. Include the begin and end lines, along with \n between each line'
+
+    //Expires date, set 20m into future
+    let now = Math.round((new Date()).getTime() / 1000) + 1199;
+
+    //Setup for token
+    let payload = {
+        "iss": issuerId,
+        "exp": now,
+        "aud": "appstoreconnect-v1"
+    };
+    let signOptions = {
+        "algorithm": "ES256",
+        header: {
+            "alg": "ES256",
+            "kid": apiKeyId,
+            "typ": "JWT"
+        }
+    };
+
+    let token = jwt.sign(payload, privateKey, signOptions);
+
+    //Options for what data to have returned
+    var getOptionsYear = function (year) {
+        //YYYY 
+        var options19 = {
+            host: "api.appstoreconnect.apple.com",
+            //path: '/v1/apps/1515131292'
+            path: `/v1/salesReports?filter[frequency]=YEARLY&filter[reportDate]=${year}&filter[reportSubType]=SUMMARY&filter[reportType]=SALES&filter[vendorNumber]=88221566&filter[version]=1_0`,
+            method: 'GET',
+            headers: {
+                'Accept': 'application/a-gzip, application/json',
+                'Authorization': 'Bearer ' + token
+            }
+        };
+        return options19;
+    };
+    var getOptionsMonth = function (year, month) {
+        //YYYY-MM 
+        var options20 = {
+            host: "api.appstoreconnect.apple.com",
+            path: `/v1/salesReports?filter[frequency]=MONTHLY&filter[reportDate]=${year}-${month}&filter[reportSubType]=SUMMARY&filter[reportType]=SALES&filter[vendorNumber]=88221566&filter[version]=1_0`,
+            method: 'GET',
+            headers: {
+                'Accept': 'application/a-gzip, application/json',
+                'Authorization': 'Bearer ' + token
+            }
+        };
+        return options20;
+    };
+    var getOptionsDaily = function (year, month, day) {
+        var options19 = {
+            //YYYY-MM-DD 
+            host: "api.appstoreconnect.apple.com",
+            //path: '/v1/apps/1515131292' 
+            path: `/v1/salesReports?filter[frequency]=DAILY&filter[reportDate]=${year}-${month}-${day}&filter[reportSubType]=SUMMARY&filter[reportType]=SALES&filter[vendorNumber]=88221566&filter[version]=1_0`,
+            method: 'GET',
+            headers: {
+                'Accept': 'application/a-gzip, application/json',
+                'Authorization': 'Bearer ' + token
+            }
+        };
+        return options19;
+    };
+
+
 
     var units = 0;
     //Tables to format dates properly
@@ -117,12 +119,14 @@ app.get('/app', (request, response) => {
     var datetime = new Date();
     datetime.setDate(datetime.getDate() - 1);
     datetime.setHours(datetime.getHours() - 6);
-    let year = datetime.getFullYear();
-    let month = datetime.getMonth();
-    let day = datetime.getDate();
+    let year = datetime.getUTCFullYear();
+    let month = datetime.getUTCMonth();
+    let day = datetime.getUTCDate();
 
     let date = `${year} - ${months[month]} - ${days[day - 1]}`;
-    console.log(date);
+
+    const current = new Date();
+    console.log(`Current date: ${current.getUTCFullYear()}-${current.getUTCMonth()}-${current.getUTCDate()}-H${current.getUTCHours()} Request date: ${date} - H${datetime.getUTCHours()}`);
 
     //Checks database for a given date
     getDataFromDate(date)
