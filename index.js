@@ -139,7 +139,7 @@ app.get('/app', (request, response) => {
 
                     res.on('data', (chunk) => {
 
-                        if (res.statusCode === '200') {
+                        if (res.statusCode === 200) {
 
                             var dataFromFile = pako.inflate(chunk, { to: 'string' })
                                 //1: app downloads, 3: redownloads, 8: app updates 
