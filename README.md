@@ -17,3 +17,9 @@ I wanted to be able to display the number of downloads my iOS apps get per day.
 
 # Tech
 Built using javascript, nodeJS, and firebase.
+
+
+# Preview
+App Download Counter                 |  Web App
+:-------------------------:|:-------------------------:
+![alt text 1](https://github.com/ajrotert/App-Store-Connect-API-Access/blob/master/AppAPI.gif?raw=true)  |   Website
